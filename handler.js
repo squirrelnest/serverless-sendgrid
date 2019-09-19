@@ -1,30 +1,15 @@
 'use strict';
 
-// module.exports.hello = async event => {
-//   return {
-//     statusCode: 200,
-//     body: JSON.stringify(
-//       {
-//         message: 'Go Serverless v1.0! Your function executed successfully!',
-//         input: event,
-//       },
-//       null,
-//       2
-//     ),
-//   };
-
-  // // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
-// };
-
-
+// dependencies
 const sgMail = require('@sendgrid/mail');
 
 // constants
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// lambda function call
-module.exports.email = async (event) => {
+// lambda function calls
+module.exports = {
+  
+  email: async (event) => {
     // const webhookData = JSON.parse(event.body);
 
     /**
@@ -32,7 +17,7 @@ module.exports.email = async (event) => {
      * email address in your user/auth provider database
      * to personalize the email
      */
-    // const { subject } = webhookData.earnedAchievement;
+    // const { subject } = webhookData.emailSubject;
     // const userInfo = await getUserInfo(subject);
 
     const msg = {
@@ -48,4 +33,22 @@ module.exports.email = async (event) => {
         statusCode: 200,
         body: 'Your function executed. Attempting to send email.'
     };
+  },
+
+  greet: async (event) => {
+    return {
+      statusCode: 200,
+      body: JSON.stringify(
+        {
+          message: 'Go Serverless v1.0! Your function executed successfully!',
+          input: event,
+        },
+        null,
+        2
+      ),
+    };
+
+    // Use this code if you don't use the http event with the LAMBDA-PROXY integration
+    // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
+  }
 };
