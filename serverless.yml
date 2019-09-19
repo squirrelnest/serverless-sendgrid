@@ -58,14 +58,15 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  email:
-    handler: handler.email
   greet:
     handler: handler.greet
+  email:
+    handler: handler.email
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
-#    events:
+    events:
+      - sqs: arn:aws:sqs:us-east-1:533083114518:MyFirstQueue
 #      - http:
 #          path: users/create
 #          method: get
