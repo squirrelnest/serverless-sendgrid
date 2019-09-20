@@ -60,6 +60,10 @@ provider:
 functions:
   greet:
     handler: handler.greet
+  dbNotify:
+    handler: handler.dbNotify
+    events:
+      - stream: arn:aws:dynamodb:us-east-1:533083114518:table/UsersTable/stream/2019-09-20T20:08:41.657
   email:
     handler: handler.email
 #    The following are a few example events you can configure
