@@ -23,11 +23,12 @@ module.exports = {
     // const userInfo = await getUserInfo(subject);
 
     const msg = {
-        to: 'halflifeheffer@gmail.com', // user's email here
-        from: 'halflifeheffer@gmail.com', // your company's email here
-        subject: 'Mooo!',
+        to: 'halflifeheffer@gmail.com', 
+        from: 'halflifeheffer@gmail.com',
+        subject: 'SQS event message received',
         text: 'Holy Cow. You sent an email via sendgrid',
-        html: '<strong>Serverless is easy to do anywhere, even with Node.js</strong>',
+        // html: `<strong>New ${JSON.stringify(event.Records[0].body)} event added to DynamoDB stream for Users table</strong>`,
+        html: '<strong>DynamoDB stream -> SNS -> SQS</strong>',
     };
     await sgMail.send(msg);
 
@@ -55,40 +56,44 @@ module.exports = {
   },
 
   dbNotify: async (event, context, callback) => {
-    // console.log(event)
+    let record = event.Records[0]
     // event.Records.forEach( record => {
-    //   console.log('Stream record: ', JSON.stringify(record, null, 2));
-    //   if (record.eventName === 'INSERT') {
-    //     var who = JSON.stringify(record.dynamodb.NewImage.Username.S);
-    //     var when = JSON.stringify(record.dynamodb.NewImage.Timestamp.S);
-    //     var what = JSON.stringify(record.dynamodb.NewImage.Message.S);
-    //     var params = {
-    //         Subject: 'A new bark from ' + who, 
-    //         Message: 'Woofer user ' + who + ' barked the following at ' + when + ':\n\n ' + what,
-    //         TopicArn: 'arn:aws:sns:us-east-1:533083114518:tyvek'
-    //     };
-    //     sns.publish(params, function(err, data) {
-    //         if (err) {
-    //             console.error("Unable to send message. Error JSON:", JSON.stringify(err, null, 2));
-    //         } else {
-    //             console.log("Results from sending message: ", JSON.stringify(data, null, 2));
-    //         }
-    //     });
-    //   }
+    if (record.eventName === 'INSERT') {
+      let who = JSON.stringify(record.dynamodb.NewImage.Username.S);
+      let when = JSON.stringify(record.dynamodb.NewImage.Timestamp.S);
+      let what = JSON.stringify(record.dynamodb.NewImage.Color.S);
+      let params = {
+          Subject: 'A new record from ' + who, 
+          Message: 'User ' + who + ' barfed ' + what + ' on ' + when,
+          TopicArn: 'arn:aws:sns:us-east-1:533083114518:tyvek'
+      };
+
+      // PUBLISH TO SNS
+      sns.publish(params, function(err, data) {
+          if (err) {
+              console.error("Unable to send message. Error JSON:", JSON.stringify(err, null, 2));
+          } else {
+              console.log("Results from sending message: ", JSON.stringify(data, null, 2));
+          }
+      });
+
+
+    }
     // })
+
     const msg = {
-      to: 'halflifeheffer@gmail.com', // user's email here
-      from: 'halflifeheffer@gmail.com', // your company's email here
+      to: 'halflifeheffer@gmail.com', 
+      from: 'halflifeheffer@gmail.com',
       subject: 'User Table modified',
       text: 'Holy Cow. You sent an email via sendgrid',
-      html: '<strong>New event added to DynamoDB stream for Users table</strong>',
+      html: `<strong>Notifying SNS: New ${event.Records[0].eventName} event added to DynamoDB stream for Users table</strong>`,
     };
     await sgMail.send(msg);
-    // callback(null, `Successfully processed ${event.Records.length} records.`);
+
     return {
       statusCode: 200,
-      body: 'Your function executed. Attempting to send email.',
-      // input: event
+      body: 'Your function executed. Attempting to notify SNS.',
+      input: record
     };
   }
 
