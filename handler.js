@@ -14,29 +14,29 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 module.exports = {
   
   email: async (event) => {
-    // const webhookData = JSON.parse(event.body);
+    for (const record of event.Records) {
+      const msg = {
+          to: 'halflifeheffer@gmail.com', 
+          from: 'halflifeheffer@gmail.com',
+          subject: 'SQS event message received',
+          text: 'Holy Cow. You sent an email via sendgrid',
+          html: `<p>MessageId: ${record.messageId}</p>
+                 <p>body: ${record.body}</p>
+                 <p>Attributes: ${JSON.stringify(record.attributes)}</p>
+                 <p>Message Attributes: ${JSON.stringify(record.messageAttributes)}</p>
+                 <p>EventSourceARN: ${record.eventSourceARN}</p>
+                 <p>MessageId: ${record.awsRegion}</p>`
+      };
 
-    /**
-     * here you would lookup the subject's full name and
-     * email address in your user/auth provider database
-     * to personalize the email
-     */
-    // const { subject } = webhookData.emailSubject;
-    // const userInfo = await getUserInfo(subject);
-
-    const msg = {
-        to: 'halflifeheffer@gmail.com', 
-        from: 'halflifeheffer@gmail.com',
-        subject: 'SQS event message received',
-        text: 'Holy Cow. You sent an email via sendgrid',
-        // html: `<strong>New ${JSON.stringify(event.Records[0].body)} event added to DynamoDB stream for Users table</strong>`,
-        html: '<strong>DynamoDB stream -> SNS -> SQS</strong>',
-    };
-    await sgMail.send(msg);
-
-    return {
-        statusCode: 200,
-        body: 'Your function executed. Attempting to send email.'
+      try {
+        await sgMail.send(msg);
+        return {
+            statusCode: 200,
+            body: 'Your function executed. Submitting email to Sendgrid.'
+        };
+      } catch(err) {
+        throw new Error('Error sending message' + err)
+      }
     };
   },
 
@@ -79,25 +79,6 @@ module.exports = {
       //     }
       //   }
       // }
-
-      // PUBLISH TO SNS
-      // sns.publish(SNSparams, function(err, data) {
-      //     if (err) {
-      //         console.error("Unable to send message. Error JSON:", JSON.stringify(err, null, 2));
-      //     } else {
-      //         console.log("Results from sending message: ", JSON.stringify(data, null, 2));
-      //     }
-      // });
-
-      // PUBLISH TO SQS
-      // sqs.sendMessage(SQSparams, function(err, data) {
-      //     if (err) {
-      //         console.error("Unable to send message. Error JSON:", JSON.stringify(err, null, 2));
-      //     } else {
-      //         console.log("Results from sending message: ", JSON.stringify(data, null, 2));
-      //     }
-      // });
-    // }
 
     // SEND EMAIL VIA SENDGRID
     const msg = {
