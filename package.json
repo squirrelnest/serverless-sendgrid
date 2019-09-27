@@ -7,7 +7,9 @@
     "@sendgrid/mail": "^6.4.0",
     "aws-sdk": "^2.532.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "serverless-localstack": "^0.4.19"
+  },
   "scripts": {
     "test": "test"
   },
