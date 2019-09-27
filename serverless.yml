@@ -49,8 +49,8 @@ custom:
   localstack:
     stages:
       # list of stages for which the plugin should be enabled
-      - local
-      - dev
+      # - local
+      # - dev
     host: http://localhost  # optional - LocalStack host to connect to
     autostart: true  # optional - start LocalStack in Docker on Serverless deploy
     debug: true
